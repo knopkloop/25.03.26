@@ -18,6 +18,8 @@ namespace knk
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
 
+    //РЕАЛИЗОВАТЬ + ПРОТЕСТИРОВАТЬ
+    size_t getCapacity() const noexcept;
     void pushBack(const T& rhs);
     void popBack();
 
