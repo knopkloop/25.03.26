@@ -1,6 +1,7 @@
 #ifndef PE_VECTOR_HPP
 #define PE_VECTOR_HPP
 #include <cstddef>
+#include <stdexcept>
 
 namespace knk
 {
@@ -104,7 +105,11 @@ void knk::Vector< T >::pushBack(const T& rhs)
 template< class T >
 void knk::Vector< T >::popBack()
 {
-
+  if (!size_)
+  {
+    throw std::out_of_range("Vector is empty");
+  }
+  --size_;
 }
 
 #endif

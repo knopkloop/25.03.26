@@ -99,10 +99,10 @@ int main()
     { testSizeOfNonEmptyVector, "Size of non-empty vector must be positive" },
     { testCapacityOfEmptyVector, "Empty vector capacity must be zero" },
     { testCapacityOfVectorAfterConstruct, "Capacity after construction must equal size" },
-    { testPushBackOnEmptyVector, "size of empty vector after pushBack must be 1" },
-    { testPushBackOnNonEmptyVector, "size of non-empty vector after pushBack must increase" },
-    { testPopBackOnEmptyVector, "popBack on empty vector must throw exception" },
-    { testPopBackOnNonEmptyVector, "size of non-empty vector after popBack must decrease"}
+    { testPushBackOnEmptyVector, "Size of empty vector after pushBack must be 1" },
+    { testPushBackOnNonEmptyVector, "Size of non-empty vector after pushBack must increase" },
+    { testPopBackOnEmptyVector, "PopBack on empty vector must throw exception" },
+    { testPopBackOnNonEmptyVector, "Size of non-empty vector after popBack must decrease" }
   };
 
   constexpr size_t count = sizeof(tests) / sizeof(case_t);
