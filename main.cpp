@@ -64,6 +64,30 @@ bool testPushBackOnNonEmptyVector(const char ** pname)
   return v.getSize() == size + 1;
 }
 
+bool testPopBackOnEmptyVector(const char ** pname)
+{
+  *pname = __func__;
+  Vector< int > v;
+  try
+  {
+    v.popBack();
+  }
+  catch(const std::out_of_range &)
+  {
+    return true;
+  }
+  return false;
+}
+
+bool testPopBackOnNonEmptyVector(const char ** pname)
+{
+  *pname = __func__;
+  constexpr size_t size = 5;
+  Vector< int > v(size, 10);
+  v.popBack();
+  return v.getSize() == size - 1;
+}
+
 int main()
 {
   using test_t = bool(*)(const char **);
@@ -76,7 +100,9 @@ int main()
     { testCapacityOfEmptyVector, "Empty vector capacity must be zero" },
     { testCapacityOfVectorAfterConstruct, "Capacity after construction must equal size" },
     { testPushBackOnEmptyVector, "size of empty vector after pushBack must be 1" },
-    { testPushBackOnNonEmptyVector, "size of non-empty vector after pushBack must increase" }
+    { testPushBackOnNonEmptyVector, "size of non-empty vector after pushBack must increase" },
+    { testPopBackOnEmptyVector, "popBack on empty vector must throw exception" },
+    { testPopBackOnNonEmptyVector, "size of non-empty vector after popBack must decrease"}
   };
 
   constexpr size_t count = sizeof(tests) / sizeof(case_t);

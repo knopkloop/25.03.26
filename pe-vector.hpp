@@ -101,4 +101,10 @@ void knk::Vector< T >::pushBack(const T& rhs)
   capacity_ = new_cap;
 }
 
+template< class T >
+void knk::Vector< T >::popBack()
+{
+
+}
+
 #endif
