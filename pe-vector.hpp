@@ -80,7 +80,25 @@ size_t knk::Vector< T >::getCapacity() const noexcept
 template< class T >
 void knk::Vector< T >::pushBack(const T& rhs)
 {
-  (void)rhs;
+  size_t new_cap = size_ ? ((size_ == capacity_) ? capacity_ * 2 : capacity_) : 1;
+  T* temp_data = new T[new_cap];
+  try
+  {
+    for (size_t i = 0; i < size_; ++i)
+    {
+      temp_data[i] = data_[i];
+    }
+    temp_data[size_++] = rhs;
+  }
+  catch(...)
+  {
+    delete[] temp_data;
+    throw;
+  }
+
+  delete[] data_;
+  data_ = temp_data;
+  capacity_ = new_cap;
 }
 
 #endif
