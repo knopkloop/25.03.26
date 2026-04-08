@@ -239,7 +239,6 @@ int main()
       ++failed;
       continue;
     }
-
   }
   std::cout << "Summary: " << (count - failed) << " passed" << "\n";
   std::cout << "\t" << " " << count << " total" << "\n";
