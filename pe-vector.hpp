@@ -15,7 +15,9 @@ namespace knk
     Vector(size_t size, const T& value);
 
     Vector(const Vector< T >& rhs);
-    Vector< T >& operator=(const Vector< T >& rhs) = delete;
+    Vector< T >& operator=(const Vector< T >& rhs);
+
+    void swap(Vector< T >& rhs) noexcept;
 
     T& operator[](size_t id) noexcept;
     const T& operator[](size_t id) const noexcept;
@@ -27,6 +29,7 @@ namespace knk
     size_t getCapacity() const noexcept;
 
     void pushBack(const T& val);
+    void pushFront(const T& val);
     void popBack();
 
   private:
@@ -73,6 +76,22 @@ knk::Vector< T >::Vector(const Vector< T >& rhs):
   {
     data_[i] = rhs.data_[i];
   }
+}
+
+template< class T >
+knk::Vector< T >& knk::Vector<T>::operator=(const Vector< T >& rhs)
+{
+  Vector< T > cpy(rhs);
+  swap(cpy);
+  return *this;
+}
+
+template< class T >
+void knk::Vector< T >::swap(Vector< T >& rhs) noexcept
+{
+  std::swap(data_, rhs.data_);
+  std::swap(size_, rhs.size_);
+  std::swap(capacity_, rhs.capacity_);
 }
 
 template< class T >
@@ -159,6 +178,18 @@ void knk::Vector< T >::pushBack(const T& val)
   {
     data_[size_++] = val;
   }
+}
+
+template< class T >
+void knk::Vector< T >::pushFront(const T& val)
+{
+  Vector< T > v(getSize() + 1);
+  v[0] = v;
+  for (size_t i = 1; i < v.getSize(); ++i)
+  {
+    v[i] = (*this)[i - 1];
+  }
+  swap(v);
 }
 
 template< class T >
