@@ -15,9 +15,9 @@ namespace knk
     Vector(size_t size, const T& value);
 
     Vector(const Vector< T >& rhs);
-    Vector< T >& operator=(const Vector< T >& rhs) noexcept;
-
     Vector(Vector< T >&& rhs);
+
+    Vector< T >& operator=(const Vector< T >& rhs) noexcept;
     Vector< T >& operator=(Vector< T >&& rhs) noexcept;
 
     void swap(Vector< T >& rhs) noexcept;
@@ -35,6 +35,14 @@ namespace knk
     void pushFront(const T& val);
     void popBack();
 
+    //ДОПИСАТЬ ТЕСТЫ ДЛЯ ПЕРЕМЕЩЕНИЯ, КОПИРОВАНИЯ и swap
+    //ДОПИСАТЬ ТЕСТЫ ДЛЯ PushFront
+    //РЕАЛИЗОВАТЬ МЕТОДЫ И ПРОТЕСТИРОВАТЬ
+    void insert(size_t id, const T& t);
+    void insert(size_t id, const Vector< T >& rhs, size_t beg, size_t end);
+    void erase(size_t id);
+    void erase(size_t beg, size_t end);
+    //ИТЕРАТОРЫ
   private:
     T* data_;
     size_t size_, capacity_;
@@ -82,14 +90,6 @@ knk::Vector< T >::Vector(const Vector< T >& rhs):
 }
 
 template< class T >
-knk::Vector< T >& knk::Vector<T>::operator=(const Vector< T >& rhs) noexcept
-{
-  Vector< T > cpy(rhs);
-  swap(cpy);
-  return *this;
-}
-
-template< class T >
 knk::Vector< T >::Vector(Vector< T >&& rhs):
   data_(rhs.data_),
   size_(rhs.size_),
@@ -99,8 +99,24 @@ knk::Vector< T >::Vector(Vector< T >&& rhs):
 }
 
 template< class T >
+knk::Vector< T >& knk::Vector<T>::operator=(const Vector< T >& rhs) noexcept
+{
+  if (this == std::addressof(rhs))
+  {
+    return *this;
+  }
+  Vector< T > cpy(rhs);
+  swap(cpy);
+  return *this;
+}
+
+template< class T >
 knk::Vector< T >& knk::Vector< T >::operator=(Vector< T >&& rhs) noexcept
 {
+  if (this == &rhs)
+  {
+    return *this;
+  }
   Vector< T > cpy(std::move(rhs));
   swap(cpy);
   return *this;
