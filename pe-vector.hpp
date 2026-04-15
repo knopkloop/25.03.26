@@ -1,5 +1,7 @@
 #ifndef PE_VECTOR_HPP
 #define PE_VECTOR_HPP
+
+#include "pe-iterators.hpp"
 #include <cstddef>
 #include <stdexcept>
 
@@ -39,6 +41,14 @@ namespace knk
     void insert(size_t id, const Vector< T >& rhs, size_t beg, size_t end);
     void erase(size_t id);
     void erase(size_t beg, size_t end);
+
+    VIter < T > begin() noexcept;
+    VIter< T > end() noexcept;
+    VIter< T > iter(size_t id) noexcept;
+
+    VCIter< T > cbegin() const noexcept;
+    VCIter< T > cend() const noexcept;
+    VCIter< T > citer(size_t id) const noexcept;
 
   private:
     T* data_;
@@ -109,10 +119,6 @@ knk::Vector< T >& knk::Vector<T>::operator=(const Vector< T >& rhs)
 template< class T >
 knk::Vector< T >& knk::Vector< T >::operator=(Vector< T >&& rhs) noexcept
 {
-  if (this == &rhs)
-  {
-    return *this;
-  }
   Vector< T > cpy(std::move(rhs));
   swap(cpy);
   return *this;
@@ -326,6 +332,42 @@ void knk::Vector< T >::erase(size_t beg, size_t end)
     v[i] = (*this)[i + count];
   }
   swap(v);
+}
+
+template< class T >
+knk::VIter< T > knk::Vector< T >::begin() noexcept
+{
+  return VIter< T >(*this, 0);
+}
+
+template< class T >
+knk::VIter< T > knk::Vector< T >::end() noexcept
+{
+  return VIter< T >(*this, size_);
+}
+
+template< class T >
+knk::VIter< T > knk::Vector< T >::iter(size_t id) noexcept
+{
+  return VIter< T >(*this, id);
+}
+
+template< class T >
+knk::VCIter< T > knk::Vector< T >::cbegin() const noexcept
+{
+  return VCIter< T >(*this, 0);
+}
+
+template< class T >
+knk::VCIter< T > knk::Vector< T >::cend() const noexcept
+{
+  return VCIter< T >(*this, size_);
+}
+
+template< class T >
+knk::VCIter< T > knk::Vector< T >::citer(size_t id) const noexcept
+{
+  return VCIter< T >(*this, id);
 }
 
 #endif
