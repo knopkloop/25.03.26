@@ -83,8 +83,7 @@ namespace knk
 template< class T >
 knk::VIter< T >::VIter(Vector< T >& vec, size_t id) noexcept:
   ptr_(&vec[id])
-{
-}
+{}
 
 template< class T >
 T& knk::VIter< T >::operator*() const noexcept
@@ -209,14 +208,12 @@ bool knk::VIter< T >::operator>=(const VIter< T >& other) const noexcept
 template< class T >
 knk::VCIter< T >::VCIter(const Vector< T >& vec, size_t id) noexcept:
   ptr_(&vec[id])
-{
-}
+{}
 
 template< class T >
 knk::VCIter< T >::VCIter(const VIter< T >& other) noexcept:
   ptr_(other.ptr_)
-{
-}
+{}
 
 template< class T >
 const T& knk::VCIter< T >::operator*() const noexcept
