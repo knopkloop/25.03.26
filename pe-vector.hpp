@@ -38,9 +38,18 @@ namespace knk
     void popBack();
 
     void insert(size_t id, const T& val);
-    void insert(size_t id, const Vector< T >& rhs, size_t beg, size_t end);
+    void insert(size_t id, const Vector< T >& rhs, size_t begin, size_t end);
+
+    void insert(VIter< T > pos, const T& val);
+    void insert(VIter< T > pos, VCIter< T > begin, VCIter< T > end);
+    void insert(VIter< T > pos, const T& val, size_t k);
+
     void erase(size_t id);
-    void erase(size_t beg, size_t end);
+    void erase(size_t begin, size_t end);
+
+    void erase(VIter< T > pos);
+    void erase(VIter< T > begin, VIter< T > end);
+    void erase(VIter< T > pos, size_t k);
 
     VIter < T > begin() noexcept;
     VIter< T > end() noexcept;
@@ -269,13 +278,13 @@ void knk::Vector< T >::insert(size_t id, const T& val)
 }
 
 template< class T >
-void knk::Vector< T >::insert(size_t id, const Vector< T >& rhs, size_t beg, size_t end)
+void knk::Vector< T >::insert(size_t id, const Vector< T >& rhs, size_t begin, size_t end)
 {
   if (id > getSize())
   {
     throw std::out_of_range("id out of bound");
   }
-  if (beg > rhs.getSize() || end > rhs.getSize() || beg > end)
+  if (begin > rhs.getSize() || end > rhs.getSize() || begin > end)
   {
     throw std::out_of_range("range out of bound");
   }
@@ -284,7 +293,7 @@ void knk::Vector< T >::insert(size_t id, const Vector< T >& rhs, size_t beg, siz
   {
     v.pushBack((*this)[i]);
   }
-  for (size_t i = beg; i < end; ++i)
+  for (size_t i = begin; i < end; ++i)
   {
     v.pushBack(rhs[i]);
   }
@@ -293,6 +302,24 @@ void knk::Vector< T >::insert(size_t id, const Vector< T >& rhs, size_t beg, siz
     v.pushBack((*this)[i]);
   }
   swap(v);
+}
+
+template< class T >
+void knk::Vector< T >::insert(VIter< T > pos, const T& val)
+{
+
+}
+
+template< class T >
+void knk::Vector< T >::insert(VIter< T > pos, VCIter< T > begin, VCIter< T > end)
+{
+
+}
+
+template< class T >
+void knk::Vector< T >::insert(VIter< T > pos, const T& val, size_t k)
+{
+
 }
 
 template< class T >
@@ -315,23 +342,42 @@ void knk::Vector< T >::erase(size_t id)
 }
 
 template< class T >
-void knk::Vector< T >::erase(size_t beg, size_t end)
+void knk::Vector< T >::erase(size_t begin, size_t end)
 {
-  if (beg > getSize() || end > getSize() || beg > end)
+  if (begin > getSize() || end > getSize() || begin > end)
   {
     throw std::out_of_range("range out of bound");
   }
-  size_t count = end - beg;
+  size_t count = end - begin;
   Vector< T > v(getSize() - count);
-  for(size_t i = 0; i < beg; ++i)
+  for(size_t i = 0; i < begin; ++i)
   {
     v[i] = (*this)[i];
   }
-  for(size_t i = beg; i < v.getSize(); ++i)
+  for(size_t i = begin; i < v.getSize(); ++i)
   {
     v[i] = (*this)[i + count];
   }
   swap(v);
+}
+
+template< class T >
+void knk::Vector< T >::erase(VIter< T > pos)
+{
+  erase(static_cast< size_t >(pos - this->begin()));
+}
+
+template< class T >
+void knk::Vector< T >::erase(VIter< T > begin, VIter< T > end)
+{
+  erase(static_cast< size_t >(begin - this->begin()), static_cast< size_t >(end - this->begin()));
+}
+
+template< class T >
+void knk::Vector< T >::erase(VIter< T > pos, size_t k)
+{
+  size_t id = static_cast< size_t >(begin - this->begin());
+  erase(id, id + k);
 }
 
 template< class T >
