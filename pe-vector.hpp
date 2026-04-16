@@ -333,6 +333,14 @@ template< class T >
 void knk::Vector< T >::insert(VIter< T > pos, VCIter< T > begin, VCIter< T > end)
 {
   size_t id = static_cast< size_t >(pos - this->begin());
+  if (id > getSize())
+  {
+    throw std::out_of_range("id out of bound");
+  }
+  if (begin > end)
+  {
+    throw std::out_of_range("range out of bound");
+  }
   Vector< T > v;
   for (size_t i = 0; i < id; ++i)
   {
@@ -353,6 +361,10 @@ template< class T >
 void knk::Vector< T >::insert(VIter< T > pos, const T& val, size_t k)
 {
   size_t id = static_cast< size_t >(pos - this->begin());
+  if (id > getSize())
+  {
+    throw std::out_of_range("id out of bound");
+  }
   Vector< T > v;
   for (size_t i = 0; i < id; ++i)
   {
