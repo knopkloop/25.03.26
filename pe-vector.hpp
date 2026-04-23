@@ -512,7 +512,7 @@ knk::VIter< T > knk::Vector< T >::insert(VIter< T > pos, VCIter< T > begin, VCIt
   size_t id = pos.getId(*this);
   if (id > getSize())
   {
-    throw std:out_of_range("id out of bound");
+    throw std::out_of_range("id out of bound");
   }
   if (begin == end)
   {
@@ -574,7 +574,6 @@ knk::VIter< T > knk::Vector< T >::erase(VIter< T > pos)
   size_t id = pos.getId(*this);
   erase(id);
   return iter(id);
-
 }
 
 template< class T >
