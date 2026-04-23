@@ -1,11 +1,17 @@
 #ifndef PE_VECTOR_HPP
 #define PE_VECTOR_HPP
 
-#include "pe-iterators.hpp"
 #include <cstddef>
 #include <stdexcept>
+
 namespace knk
 {
+  template< class T >
+  class VIter;
+
+  template< class T >
+  class VCIter;
+
   template < class T >
   class Vector
   {
@@ -44,8 +50,10 @@ namespace knk
     void erase(size_t id);
     void erase(size_t begin, size_t end);
 
-    VIter < T > begin() noexcept;
+    VIter< T > begin() noexcept;
     VIter< T > end() noexcept;
+    VCIter< T > begin() const noexcept;
+    VCIter< T > end() const noexcept;
     VIter< T > iter(size_t idx) noexcept;
 
     VCIter< T > cbegin() const noexcept;
@@ -64,6 +72,80 @@ namespace knk
     T* data_;
     size_t size_, capacity_;
     explicit Vector(size_t size);
+    friend class VIter< T >;
+    friend class VCIter< T >;
+  };
+
+  template< class T >
+  class VIter
+  {
+  public:
+    VIter(T* ptr) noexcept;
+    VIter(Vector< T >& vec, size_t idx) noexcept;
+    ~VIter() = default;
+
+    T& operator*() const noexcept;
+    T* operator->() const noexcept;
+
+    VIter& operator++() noexcept;
+    VIter operator++(int) noexcept;
+    VIter& operator--() noexcept;
+    VIter operator--(int) noexcept;
+
+    VIter& operator+=(size_t n) noexcept;
+    VIter& operator-=(size_t n) noexcept;
+    VIter operator+(size_t n) const noexcept;
+    VIter operator-(size_t n) const noexcept;
+    int operator-(const VIter< T >& other) const noexcept;
+
+    size_t getId(const Vector< T >& vec) const noexcept;
+
+    bool operator==(const VIter< T >& other) const noexcept;
+    bool operator!=(const VIter< T >& other) const noexcept;
+    bool operator<(const VIter< T >& other) const noexcept;
+    bool operator<=(const VIter< T >& other) const noexcept;
+    bool operator>(const VIter< T >& other) const noexcept;
+    bool operator>=(const VIter< T >& other) const noexcept;
+
+  private:
+    T* ptr_;
+    friend class VCIter< T >;
+  };
+
+  template< class T >
+  class VCIter
+  {
+  public:
+    VCIter(const T* ptr) noexcept;
+    VCIter(const Vector< T >&vec, size_t idx) noexcept;
+    VCIter(const VIter< T >& other) noexcept;
+    ~VCIter() = default;
+
+    const T& operator*() const noexcept;
+    const T* operator->() const noexcept;
+
+    VCIter& operator++() noexcept;
+    VCIter operator++(int) noexcept;
+    VCIter& operator--() noexcept;
+    VCIter operator--(int) noexcept;
+
+    VCIter& operator+=(size_t n) noexcept;
+    VCIter& operator-=(size_t n) noexcept;
+    VCIter operator+(size_t n) const noexcept;
+    VCIter operator-(size_t n) const noexcept;
+    int operator-(const VCIter< T >& other) const noexcept;
+
+    size_t getId(const Vector< T >& vec) const noexcept;
+
+    bool operator==(const VCIter< T >& other) const noexcept;
+    bool operator!=(const VCIter< T >& other) const noexcept;
+    bool operator<(const VCIter< T >& other) const noexcept;
+    bool operator<=(const VCIter< T >& other) const noexcept;
+    bool operator>(const VCIter< T >& other) const noexcept;
+    bool operator>=(const VCIter< T >& other) const noexcept;
+
+  private:
+    const T* cptr_;
   };
 }
 
@@ -305,7 +387,7 @@ void knk::Vector< T >::insert(size_t id, const Vector< T >& rhs, size_t begin, s
   {
     return;
   }
-  else if (begin > rhs.getSize() || end > rhs.getSize() || begin > end)
+  if (begin > rhs.getSize() || end > rhs.getSize() || begin > end)
   {
     throw std::out_of_range("range out of bound");
   }
@@ -351,7 +433,7 @@ void knk::Vector< T >::erase(size_t begin, size_t end)
   {
     return;
   }
-  else if (begin > getSize() || end > getSize() || begin > end)
+  if (begin > getSize() || end > getSize() || begin > end)
   {
     throw std::out_of_range("range out of bound");
   }
@@ -381,6 +463,18 @@ knk::VIter< T > knk::Vector< T >::end() noexcept
 }
 
 template< class T >
+knk::VCIter< T > knk::Vector< T >::begin() const noexcept
+{
+  return VCIter< T >(*this, 0);
+}
+
+template< class T >
+knk::VCIter< T > knk::Vector< T >::end() const noexcept
+{
+  return VCIter< T >(*this, size_);
+}
+
+template< class T >
 knk::VIter< T > knk::Vector< T >::iter(size_t idx) noexcept
 {
   return VIter< T >(*this, idx);
@@ -407,7 +501,7 @@ knk::VCIter< T > knk::Vector< T >::citer(size_t idx) const noexcept
 template< class T >
 knk::VIter< T > knk::Vector< T >::insert(VIter< T > pos, const T& val)
 {
-  size_t id = pos.id_;
+  size_t id = pos.getId(*this);
   insert(id, val);
   return iter(id);
 }
@@ -415,19 +509,40 @@ knk::VIter< T > knk::Vector< T >::insert(VIter< T > pos, const T& val)
 template< class T >
 knk::VIter< T > knk::Vector< T >::insert(VIter< T > pos, VCIter< T > begin, VCIter< T > end)
 {
+  size_t id = pos.getId(*this);
+  if (id > getSize())
+  {
+    throw std:out_of_range("id out of bound");
+  }
   if (begin == end)
   {
     return pos;
   }
-  size_t id = pos.id_;
-  insert(id, begin.vector_, begin.id_, end.id_);
+  if (begin > end)
+  {
+    throw std::out_of_range("range out of bound");
+  }
+  Vector< T > v;
+  for (size_t i = 0; i < id; ++i)
+  {
+    v.pushBack((*this)[i]);
+  }
+  for (auto it = begin; it != end; ++it)
+  {
+    v.pushBack(*it);
+  }
+  for (size_t i = id; i < getSize(); ++i)
+  {
+    v.pushBack((*this)[i]);
+  }
+  swap(v);
   return iter(id);
 }
 
 template< class T >
 knk::VIter< T > knk::Vector< T >::insert(VIter< T > pos, const T& val, size_t k)
 {
-  size_t id = pos.id_;
+  size_t id = pos.getId(*this);
   if (id > getSize())
   {
     throw std::out_of_range("id out of bound");
@@ -456,7 +571,7 @@ knk::VIter< T > knk::Vector< T >::insert(VIter< T > pos, const T& val, size_t k)
 template< class T >
 knk::VIter< T > knk::Vector< T >::erase(VIter< T > pos)
 {
-  size_t id = pos.id_;
+  size_t id = pos.getId(*this);
   erase(id);
   return iter(id);
 
@@ -469,17 +584,282 @@ knk::VIter< T > knk::Vector< T >::erase(VIter< T > begin, VIter< T > end)
   {
     return begin;
   }
-  size_t b = begin.id_;
-  erase(b, end.id_);
+  size_t b = begin.getId(*this);
+  erase(b, end.getId(*this));
   return iter(b);
 }
 
 template< class T >
 knk::VIter< T > knk::Vector< T >::erase(VIter< T > pos, size_t k)
 {
-  size_t id = pos.id_;
+  size_t id = pos.getId(*this);
   erase(id, id + k);
   return iter(id);
+}
+
+template< class T >
+knk::VIter< T >::VIter(T* ptr) noexcept:
+  ptr_(ptr)
+{}
+
+template< class T >
+knk::VIter< T >::VIter(Vector< T >& vec, size_t idx) noexcept:
+  ptr_(&vec[idx])
+{}
+
+template< class T >
+T& knk::VIter< T >::operator*() const noexcept
+{
+  return *ptr_;
+}
+
+template< class T >
+T* knk::VIter< T >::operator->() const noexcept
+{
+  return ptr_;
+}
+
+template< class T >
+knk::VIter< T >& knk::VIter< T >::operator++() noexcept
+{
+  ++ptr_;
+  return *this;
+}
+
+template< class T >
+knk::VIter< T > knk::VIter< T >::operator++(int) noexcept
+{
+  VIter< T > tmp = *this;
+  ++ptr_;
+  return tmp;
+}
+
+template< class T >
+knk::VIter< T >& knk::VIter< T >::operator--() noexcept
+{
+  --ptr_;
+  return *this;
+}
+
+template< class T >
+knk::VIter< T > knk::VIter< T >::operator--(int) noexcept
+{
+  VIter< T > tmp = *this;
+  --ptr_;
+  return tmp;
+}
+
+template< class T >
+knk::VIter< T >& knk::VIter< T >::operator+=(size_t n) noexcept
+{
+  ptr_ += n;
+  return *this;
+}
+
+template< class T >
+knk::VIter< T >& knk::VIter< T >::operator-=(size_t n) noexcept
+{
+  ptr_ -= n;
+  return *this;
+}
+
+template< class T >
+knk::VIter< T > knk::VIter< T >::operator+(size_t n) const noexcept
+{
+  VIter< T > tmp = *this;
+  tmp += n;
+  return tmp;
+}
+
+template< class T >
+knk::VIter< T > knk::VIter< T >::operator-(size_t n) const noexcept
+{
+  VIter< T > tmp = *this;
+  tmp -= n;
+  return tmp;
+}
+
+template< class T >
+int knk::VIter< T >::operator-(const VIter< T >& other) const noexcept
+{
+  return static_cast< int >(ptr_ - other.ptr_);
+}
+
+template< class T >
+size_t knk::VIter< T >::getId(const Vector< T >& vec) const noexcept
+{
+  return static_cast< size_t >(ptr_ - vec.data_);
+}
+
+template< class T >
+bool knk::VIter< T >::operator==(const VIter< T >& other) const noexcept
+{
+  return ptr_ == other.ptr_;
+}
+
+template< class T >
+bool knk::VIter< T >::operator!=(const VIter< T >&other) const noexcept
+{
+  return !(*this == other);
+}
+
+template< class T >
+bool knk::VIter< T >::operator<(const VIter< T >& other) const noexcept
+{
+  return ptr_ <  other.ptr_;
+}
+
+template< class T >
+bool knk::VIter< T >::operator<=(const VIter< T >& other) const noexcept
+{
+  return ptr_ <= other.ptr_;
+}
+
+template< class T >
+bool knk::VIter< T >::operator>(const VIter< T >& other) const noexcept
+{
+  return ptr_ > other.ptr_;
+}
+
+template< class T >
+bool knk::VIter< T >::operator>=(const VIter< T >& other) const noexcept
+{
+  return ptr_ >= other.ptr_;
+}
+
+template< class T >
+knk::VCIter< T >::VCIter(const T* ptr) noexcept:
+  cptr_(ptr)
+{}
+
+template< class T >
+knk::VCIter< T >::VCIter(const Vector< T >& vec, size_t idx) noexcept:
+  cptr_(&vec[idx])
+{}
+
+template< class T >
+knk::VCIter< T >::VCIter(const VIter< T >& other) noexcept:
+  cptr_(other.ptr_)
+{}
+
+template< class T >
+const T& knk::VCIter< T >::operator*() const noexcept
+{
+  return *cptr_;
+}
+
+template< class T >
+const T* knk::VCIter< T >::operator->() const noexcept
+{
+  return cptr_;
+}
+
+template< class T >
+knk::VCIter< T >& knk::VCIter< T >::operator++() noexcept
+{
+  ++cptr_;
+  return *this;
+}
+
+template< class T >
+knk::VCIter< T > knk::VCIter< T >::operator++(int) noexcept
+{
+  VCIter< T > tmp = *this;
+  ++cptr_;
+  return tmp;
+}
+
+template< class T >
+knk::VCIter< T >& knk::VCIter< T >::operator--() noexcept
+{
+  --cptr_;
+  return *this;
+}
+
+template< class T >
+knk::VCIter< T > knk::VCIter< T >::operator--(int) noexcept
+{
+  VCIter< T > tmp = *this;
+  --cptr_;
+  return tmp;
+}
+
+template< class T >
+knk::VCIter< T >& knk::VCIter< T >::operator+=(size_t n) noexcept
+{
+  cptr_ += n;
+  return *this;
+}
+
+template< class T >
+knk::VCIter< T >& knk::VCIter< T >::operator-=(size_t n) noexcept
+{
+  cptr_ -= n;
+  return *this;
+}
+
+template< class T >
+knk::VCIter< T > knk::VCIter< T >::operator+(size_t n) const noexcept
+{
+  VCIter< T > tmp = *this;
+  tmp += n;
+  return tmp;
+}
+
+template< class T >
+knk::VCIter< T > knk::VCIter< T >::operator-(size_t n) const noexcept
+{
+  VCIter< T > tmp = *this;
+  tmp -= n;
+  return tmp;
+}
+
+template< class T >
+int knk::VCIter< T >::operator-(const VCIter< T >& other) const noexcept
+{
+  return static_cast< int >(cptr_ - other.cptr_);
+}
+
+template< class T >
+size_t knk::VCIter< T >::getId(const Vector< T >& vec) const noexcept
+{
+  return static_cast< size_t >(cptr_ - vec.data_);
+}
+
+template< class T >
+bool knk::VCIter< T >::operator==(const VCIter< T >& other) const noexcept
+{
+  return cptr_ == other.cptr_;
+}
+
+template< class T >
+bool knk::VCIter< T >::operator!=(const VCIter< T >& other) const noexcept
+{
+  return !(*this == other);
+}
+
+template< class T >
+bool knk::VCIter< T >::operator<(const VCIter< T >& other) const noexcept
+{
+  return cptr_ < other.cptr_;
+}
+
+template< class T >
+bool knk::VCIter< T >::operator<=(const VCIter< T >& other) const noexcept
+{
+  return cptr_ <= other.cptr_;
+}
+
+template< class T >
+bool knk::VCIter< T >::operator>(const VCIter< T >& other) const noexcept
+{
+  return cptr_ > other.cptr_;
+}
+
+template< class T >
+bool knk::VCIter< T >::operator>=(const VCIter< T >& other) const noexcept
+{
+  return cptr_ >= other.cptr_;
 }
 
 #endif
